@@ -20,30 +20,21 @@ const (
 	Error Level = 40
 )
 
-var _globalLevel Level
+var _globalLevel = flag.String("log-level", "info", "sets the desired log level (\"debug\", \"info\", \"warn\", \"error\")")
 
-func init() {
-	var levelStr string
-
-	flag.StringVar(&levelStr, "level", "info", "sets the desired log level (\"debug\", \"info\", \"warn\", \"error\")")
-
-	flag.Parse()
-
-	switch levelStr {
+func getLevel() Level {
+	switch *_globalLevel {
 	case "info":
-		_globalLevel = Info
-		break
+		return Info
 	case "warn":
-		_globalLevel = Warn
-		break
+		return Warn
 	case "error":
-		_globalLevel = Error
-		break
+		return Error
 	case "debug":
-	default:
-		_globalLevel = Debug
-		break
+		return Debug
 	}
+
+	return Info
 }
 
 // Logger represents the logging object
@@ -58,7 +49,7 @@ func New(prefix string) (logger *Logger) {
 	logger = new(Logger)
 	logger.logger = log.New(os.Stdout, prefix, 0)
 	logger.errorLog = log.New(os.Stderr, prefix, 0)
-	logger.level = _globalLevel
+	logger.level = getLevel()
 	return
 }
 
